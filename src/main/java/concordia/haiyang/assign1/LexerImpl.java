@@ -17,50 +17,100 @@ public class LexerImpl implements Lexer {
 	
 	private BufferedReader r;
 	private String line;
-	private int lineNo;
+	private int lineNo=-1;
 	private int pos;
 	public LexerImpl(Reader r){
 		this.r=new BufferedReader(r);
 	}
 	
-	public Token nextToken() throws IOException, LineError{
-		if( line ==null || pos==line.length()-1 ){
-			this.lineNo++;
-			pos=0;
-			line=r.readLine();
+	
+	boolean isSwitch(String sa, String sb){
+		if(sb.length()==0){
+			return true;
 		}
-		if(line==null)
-		return null;
 		
-		int l=line.length();
-		for(;l>pos;l--){
-			String s=line.substring(pos, l);
-			
-			for(TokenClass tc: TokenClass.regex.keySet()){
-				String re = TokenClass.regex.get(tc);
-				if(re.matches(s)){
+		if((!sa.matches("\\s")) && sb.matches("\\s")){
+			return true;
+		}
+		if((!sb.matches("\\s")) && sa.matches("\\s")){
+			return true;
+		}
+		String toNonW="[\\+\\-\\*\\/=<>\\{\\}\\(\\)\\[\\];\\.]";
+		if( sa.matches(toNonW) || sb.matches(toNonW) ){
+			return true;
+		}
+		return false;
+	}
+	
+	
+	
+	
+	public Token nextToken() throws IOException, LineError{
+		if( line ==null || pos>=line.length() ){
+			this.lineNo++;
+			this.pos=0;
+			this.line=r.readLine();
+		}
+		if(line==null){
+			log("no token anymore");
+			return null;
+		}
+		
+		int l=line.length()-1;
+		String sNow="", sPre="";
+		for(;l>=pos;l--){
+			sPre=sNow;
+			sNow=line.charAt(l)+"";
+			if(!this.isSwitch(sNow, sPre)){
+				continue;
+			}
+
+			String s=line.substring(pos, l+1);
+			for(TC tc: TC.res.keySet()){
+				if(tc==TC.Tblank){
+					//log("bbbb");
+				}
+				String re = TC.res.get(tc);
+				if(s.matches(re)){
+					pos+=s.length();
 					return new Token(tc, s);
 				};
 			}
 		}
-		throw new LineError(line, lineNo);
 		
-	}
-	static Logger log=LogManager.getLogger(LexerImpl.class);
-	public void tt(){
-		Map<TokenClass, String> m=TokenClass.regex;
-		String s=m.get(TokenClass.Tclass);
-		boolean ma= s.matches("class");
-		s=m.get(TokenClass.Tid);
-		ma="a".matches(s);
-		log.error("match: "+ma);
+		//if(pos=l-1)
+			throw new LineError(line, lineNo, pos);
 		
 		
 	}
 	
+	static void log(String msg){
+		System.out.println(msg);
+	}
+	
+	public void tt(){
+		Map<TC, String> m=TC.res;
+		String s=m.get(TC.Tclass);
+		boolean ma= s.matches("class");
+		s=m.get(TC.Tid);
+		ma="/*".matches("[\\*\\/]");
+		log("match: "+ma);
+	}
+	
+	
+	
 	public static class LineError extends Exception{
-		public LineError(String line, int lineNo){
-			
+		String line;
+		int lNo;
+		int pos;
+		public LineError(String line, int lineNo, int pos){
+			this.line=line;
+			this.lNo=lineNo;
+			this.pos=pos;
+		}
+		@Override
+		public String toString(){
+			return String.format("[Error # %d ]: %s, left: [%s]", this.lNo, this.line, this.line.substring(pos));
 		}
 	}
 	
@@ -68,7 +118,25 @@ public class LexerImpl implements Lexer {
 		InputStream sample = LexerImpl.class.getClassLoader().getResourceAsStream("sample.txt");
 		Reader r=new InputStreamReader(sample);
 		LexerImpl lexer=new LexerImpl(r);
-		lexer.tt();
+		
+		//log("-----------"+"100".matches("\\d(\\.\\d+)?"));
+		
+		try{
+			int l=0;
+			for(Token tk=lexer.nextToken(); tk!=null; tk=lexer.nextToken()){
+				if(l!=lexer.lineNo){
+					System.out.println();
+					l=lexer.lineNo;
+				}
+				
+				System.out.print(String.format("%s[%s]", tk.lexeme, tk.tc));
+				
+			}
+		}catch(LineError e){
+			log("");
+			log(e.toString());
+		}
+		
 	//	while lexer.nextToken();
 	}
 	
