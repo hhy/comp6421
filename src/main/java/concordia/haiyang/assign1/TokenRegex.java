@@ -1,6 +1,7 @@
 package concordia.haiyang.assign1;
 
-interface Lexer {
+public class TokenRegex {
 	
-	Token nextToken();
+	
+	
 }
