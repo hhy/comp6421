@@ -4,7 +4,7 @@
 import java.util.Map;
 	
 	public enum TokenClass {
-		Tclass, //class
+			Tclass, //class
 		Tprogram, //program
 		Tif, //if
 		Tthen,
@@ -13,49 +13,49 @@ import java.util.Map;
 		Tget,
 		Tput,
 		Treturn,
-		
 		Tid, 
 		Tnum, // integer and float
 		Tnot,
 		Tint,
 		Tfloat,
-		TassignOp,
 		TrelOp,
 		TaddOp,
 		TmultiOp,
-		
-		PUNC, //punctuation, ; , .  
+		TassignOp,		
+		Tpunctuation, //punctuation, ; , .  
 		KW, //keyword and not, or , if, then, else, for, class, int, float, get, put, return, program
-		SP, EP, SB, EB, SS, ES; //start/end parentheses, brace, square brace   
-		static Map<TokenClass, String> regex=new HashMap<>();
+		SP, EP, SB, EB, SS, ES,  //start/end parentheses, brace, square brace
+		Tblank;
+		static Map<TC, String> res=new HashMap<>();
 		static{
-			regex.put(Tclass, "class");
-			regex.put(Tprogram, "program");
-			regex.put(Tif,"if");
-			regex.put(Tthen,"then");
-			regex.put(Telse,"else");
-			regex.put(Tfor,"for");
-			regex.put(Tget,"get");
-			regex.put(Tput, "put");
-			regex.put(Treturn,"return");
-			
-			regex.put(Tid,"[a-zA-Z](\\w)*"); 
-			regex.put(Tnum, "\\d(\\.\\d+)?");
-			regex.put(Tnot, "not");
-			regex.put(Tint,"int");
-			regex.put(Tfloat,"float");
-			regex.put(TassignOp,"=");
-			regex.put(TrelOp,"||||");
-			regex.put(TaddOp,"||||");
-			regex.put(TmultiOp,"");
-			
-			regex.put(PUNC, "");//punctuation, ; , .  
-			regex.put(KW, ""); //keyword and not, or , if, then, else, for, class, int, float, get, put, return, program
-			regex.put(SP, "(");
-			regex.put(EP, "");
-			regex.put(SB,"");regex.put(EB, "");
-			regex.put(SS, "");
-			regex.put(ES,""); //start/end parentheses, brace, square brace    
+			res.put(Tclass, "class");
+			res.put(Tprogram, "program");
+			res.put(Tif,"if");
+			res.put(Tthen,"then");
+			res.put(Telse,"else");
+			res.put(Tfor,"for");
+			res.put(Tget,"get");
+			res.put(Tput, "put");
+			res.put(Treturn,"return");
+			res.put(Tid,"[a-zA-Z](\\w)*"); 
+			res.put(Tnum, "\\d+(\\.\\d+)?");
+			res.put(Tnot, "not");
+			res.put(Tint,"int");
+			res.put(Tfloat,"float");
+
+			res.put(TrelOp,"(==)|(<>)|(<=)|(>=)|[><]");
+			res.put(TaddOp,"[\\+-]|(or)");
+			res.put(TmultiOp,"[\\*/]|(and)");
+			res.put(Tpunctuation, "[,;\\.]");//punctuation, ; , .  
+			//res.put(KW, ""); //keyword and not, or , if, then, else, for, class, int, float, get, put, return, program
+			res.put(TassignOp,"=");
+			res.put(SP, "\\(");
+			res.put(EP, "\\)");
+			res.put(SB,"\\{");
+			res.put(EB, "\\}");
+			res.put(SS, "\\[");
+			res.put(ES,"\\]"); //start/end parentheses, brace, square brace
+			res.put(Tblank,"\\s+"); //start/end parentheses, brace, square brace
 		}
 	
 	}
